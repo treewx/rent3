@@ -86,6 +86,14 @@ logger.info(f"Database URL configured: {'Yes' if os.getenv('DATABASE_URL') else 
 logger.info(f"Email configured: {'Yes' if os.getenv('EMAIL_SENDER') else 'No'}")
 logger.info(f"Stripe configured: {'Yes' if os.getenv('STRIPE_SECRET_KEY') else 'No'}")
 
+# Initialize database tables
+try:
+    with app.app_context():
+        db.create_all()
+        logger.info("Database tables created successfully")
+except Exception as e:
+    logger.error(f"Database initialization error: {str(e)}", exc_info=True)
+
 # Routes
 @app.route('/')
 def index():
