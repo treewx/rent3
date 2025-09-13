@@ -50,7 +50,10 @@ limiter.init_app(app)
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(name)s %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 # Initialize scheduler for rent checking
@@ -71,6 +74,17 @@ if not app.debug and os.getenv('FLASK_ENV') != 'development':
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+# Check required environment variables
+required_env_vars = ['SECRET_KEY', 'DATABASE_URL']
+missing_vars = [var for var in required_env_vars if not os.getenv(var)]
+if missing_vars:
+    logger.error(f"Missing required environment variables: {missing_vars}")
+
+# Log configuration status
+logger.info(f"Database URL configured: {'Yes' if os.getenv('DATABASE_URL') else 'No'}")
+logger.info(f"Email configured: {'Yes' if os.getenv('EMAIL_SENDER') else 'No'}")
+logger.info(f"Stripe configured: {'Yes' if os.getenv('STRIPE_SECRET_KEY') else 'No'}")
 
 # Routes
 @app.route('/')
@@ -110,7 +124,7 @@ def register():
 
         except Exception as e:
             db.session.rollback()
-            logger.error(f"Registration error: {str(e)}")
+            logger.error(f"Registration error: {str(e)}", exc_info=True)
             flash('An error occurred during registration. Please try again.', 'error')
 
     return render_template('register.html', form=form)
