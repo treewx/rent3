@@ -64,7 +64,7 @@ scheduler.add_job(
 )
 
 # Start scheduler if not in debug mode or during testing
-if not app.debug:
+if not app.debug and os.getenv('FLASK_ENV') != 'development':
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 
@@ -523,4 +523,7 @@ def stripe_webhook():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+
+    port = int(os.getenv('PORT', 5000))
+    debug = os.getenv('FLASK_ENV') == 'development'
+    app.run(host='0.0.0.0', port=port, debug=debug)

@@ -11,4 +11,4 @@ requests==2.31.0
 stripe==7.8.0
 APScheduler==3.10.4
 cryptography==41.0.7
-secrets
+gunicorn==21.2.0
