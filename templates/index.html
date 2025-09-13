@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Rent Tracker - Automated Rent Management{% endblock %}
+
+{% block content %}
+<div class="hero-section py-5 mb-5" style="background: linear-gradient(135deg, #007bff, #0056b3);">
+    <div class="container text-white">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Automated Rent Tracking</h1>
+                <p class="lead mb-4">Never miss a rent payment again. Get instant notifications when rent is received or missed, directly from your bank account.</p>
+                <div class="d-grid gap-2 d-md-block">
+                    {% if not current_user.is_authenticated %}
+                        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-3">
+                            <i class="fas fa-user-plus"></i> Get Started Free
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">
+                            <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-home" style="font-size: 8rem; opacity: 0.7;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-bell text-primary" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3">Instant Notifications</h4>
+                    <p>Get email alerts the moment rent is received or when payments are missed.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-university text-primary" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3">Bank Integration</h4>
+                    <p>Direct integration with your bank account through secure Akahu API.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line text-primary" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3">Easy Management</h4>
+                    <p>Manage multiple properties with automated rent tracking and tenant notifications.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-lg-12 text-center">
+            <h2 class="mb-4">How It Works</h2>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.2rem; font-weight: bold;">1</div>
+                    <h5 class="mt-3">Sign Up</h5>
+                    <p>Create your account and verify your email address.</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.2rem; font-weight: bold;">2</div>
+                    <h5 class="mt-3">Connect Bank</h5>
+                    <p>Securely connect your bank account using Akahu.</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.2rem; font-weight: bold;">3</div>
+                    <h5 class="mt-3">Add Properties</h5>
+                    <p>Set up your rental properties and tenant details.</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.2rem; font-weight: bold;">4</div>
+                    <h5 class="mt-3">Get Notified</h5>
+                    <p>Receive automatic notifications about rent payments.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

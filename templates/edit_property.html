@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Property - Rent Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-edit"></i> Edit Property
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.property_address.label(class="form-label") }}
+                        {{ form.property_address(class="form-control" + (" is-invalid" if form.property_address.errors else ""), rows="3") }}
+                        {% if form.property_address.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.property_address.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.tenant_name.label(class="form-label") }}
+                            {{ form.tenant_name(class="form-control" + (" is-invalid" if form.tenant_name.errors else "")) }}
+                            {% if form.tenant_name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.tenant_name.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.tenant_email.label(class="form-label") }}
+                            {{ form.tenant_email(class="form-control" + (" is-invalid" if form.tenant_email.errors else "")) }}
+                            {% if form.tenant_email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.tenant_email.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.rent_amount.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.rent_amount(class="form-control" + (" is-invalid" if form.rent_amount.errors else "")) }}
+                                {% if form.rent_amount.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.rent_amount.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.rent_frequency.label(class="form-label") }}
+                            {{ form.rent_frequency(class="form-select" + (" is-invalid" if form.rent_frequency.errors else ""), id="rent_frequency") }}
+                            {% if form.rent_frequency.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.rent_frequency.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3" id="day_of_week_field">
+                            {{ form.rent_due_day_of_week.label(class="form-label") }}
+                            {{ form.rent_due_day_of_week(class="form-select" + (" is-invalid" if form.rent_due_day_of_week.errors else "")) }}
+                            {% if form.rent_due_day_of_week.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.rent_due_day_of_week.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3" id="day_of_month_field" style="display: none;">
+                            {{ form.rent_due_day.label(class="form-label") }}
+                            {{ form.rent_due_day(class="form-select" + (" is-invalid" if form.rent_due_day.errors else "")) }}
+                            {% if form.rent_due_day.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.rent_due_day.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.bank_statement_keyword.label(class="form-label") }}
+                        <div class="input-group">
+                            {{ form.bank_statement_keyword(class="form-control" + (" is-invalid" if form.bank_statement_keyword.errors else "")) }}
+                            <button type="button" class="btn btn-outline-secondary" id="search_transactions">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        {% if form.bank_statement_keyword.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.bank_statement_keyword.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">This keyword will be used to identify rent payments in your bank statements.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            {{ form.send_tenant_reminder(class="form-check-input") }}
+                            {{ form.send_tenant_reminder.label(class="form-check-label") }}
+                        </div>
+                        <div class="form-text">When enabled, the tenant will receive an automated reminder email if rent is not received on time.</div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Search Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Rent Payment Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> This feature will be available once Akahu integration is fully implemented.
+                </div>
+                <p>Here you'll be able to search and select transactions from your bank account to automatically populate the rent amount and keyword fields.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const frequencySelect = document.getElementById('rent_frequency');
+    const dayOfWeekField = document.getElementById('day_of_week_field');
+    const dayOfMonthField = document.getElementById('day_of_month_field');
+    const searchButton = document.getElementById('search_transactions');
+
+    function toggleDueFields() {
+        const frequency = frequencySelect.value;
+        if (frequency === 'Monthly') {
+            dayOfWeekField.style.display = 'none';
+            dayOfMonthField.style.display = 'block';
+        } else {
+            dayOfWeekField.style.display = 'block';
+            dayOfMonthField.style.display = 'none';
+        }
+    }
+
+    frequencySelect.addEventListener('change', toggleDueFields);
+    toggleDueFields(); // Initialize on page load
+
+    searchButton.addEventListener('click', function() {
+        const modal = new bootstrap.Modal(document.getElementById('transactionModal'));
+        modal.show();
+    });
+});
+</script>
+{% endblock %}

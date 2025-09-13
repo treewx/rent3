@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Rent Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Dashboard</h1>
+    <div>
+        <a href="{{ url_for('akahu_setup') }}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-university"></i> Bank Setup
+        </a>
+        {% if can_add_property %}
+            <a href="{{ url_for('add_property') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Property
+            </a>
+        {% else %}
+            <a href="{{ url_for('upgrade_subscription') }}" class="btn btn-warning">
+                <i class="fas fa-star"></i> Upgrade to Add More
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Properties</h5>
+                <h2 class="text-primary">{{ property_count }}</h2>
+                <p class="text-muted">{% if current_user.subscription_active %}Unlimited{% else %}{{ 1 - property_count }} remaining{% endif %}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Account Status</h5>
+                <h5>
+                    {% if current_user.subscription_active %}
+                        <span class="badge bg-success">Premium</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Free</span>
+                    {% endif %}
+                </h5>
+                {% if not current_user.subscription_active %}
+                    <p class="text-muted">1 property limit</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Bank Connected</h5>
+                <h5>
+                    {% if current_user.akahu_credentials %}
+                        <span class="badge bg-success"><i class="fas fa-check"></i> Yes</span>
+                    {% else %}
+                        <span class="badge bg-warning"><i class="fas fa-times"></i> No</span>
+                    {% endif %}
+                </h5>
+                {% if not current_user.akahu_credentials %}
+                    <p class="text-muted">Connect to start tracking</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Email Verified</h5>
+                <h5>
+                    {% if current_user.email_verified %}
+                        <span class="badge bg-success"><i class="fas fa-check"></i> Yes</span>
+                    {% else %}
+                        <span class="badge bg-danger"><i class="fas fa-times"></i> No</span>
+                    {% endif %}
+                </h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not current_user.email_verified %}
+<div class="alert alert-warning">
+    <h5><i class="fas fa-exclamation-triangle"></i> Email Verification Required</h5>
+    <p>Please verify your email address to ensure you receive important notifications about your rent payments.</p>
+    <a href="{{ url_for('resend_verification') }}" class="btn btn-warning">Resend Verification Email</a>
+</div>
+{% endif %}
+
+{% if not current_user.akahu_credentials %}
+<div class="alert alert-info">
+    <h5><i class="fas fa-info-circle"></i> Connect Your Bank Account</h5>
+    <p>To start tracking rent payments, you need to connect your bank account using Akahu credentials.</p>
+    <a href="{{ url_for('akahu_setup') }}" class="btn btn-primary">Connect Bank Account</a>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Your Properties</h5>
+            </div>
+            <div class="card-body">
+                {% if properties %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Property Address</th>
+                                    <th>Tenant</th>
+                                    <th>Rent Amount</th>
+                                    <th>Frequency</th>
+                                    <th>Due Day</th>
+                                    <th>Tenant Reminders</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for property in properties %}
+                                <tr>
+                                    <td>{{ property.property_address }}</td>
+                                    <td>
+                                        <div>{{ property.tenant_name }}</div>
+                                        <small class="text-muted">{{ property.tenant_email }}</small>
+                                    </td>
+                                    <td>${{ "%.2f"|format(property.rent_amount) }}</td>
+                                    <td>{{ property.rent_frequency }}</td>
+                                    <td>
+                                        {% if property.rent_frequency == 'Monthly' %}
+                                            {{ property.rent_due_day }}th
+                                        {% else %}
+                                            {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                                            {{ days[property.rent_due_day_of_week] }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if property.send_tenant_reminder %}
+                                            <span class="badge bg-success">Enabled</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Disabled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('edit_property', property_id=property.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{{ url_for('delete_property', property_id=property.id) }}"
+                                           class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('Are you sure you want to delete this property?')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-home text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="text-muted mt-3">No Properties Added Yet</h4>
+                        <p class="text-muted">Add your first rental property to start tracking rent payments.</p>
+                        {% if can_add_property %}
+                            <a href="{{ url_for('add_property') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add Your First Property
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('upgrade_subscription') }}" class="btn btn-warning">
+                                <i class="fas fa-star"></i> Upgrade to Add Properties
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

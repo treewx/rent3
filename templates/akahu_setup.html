@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Akahu Setup - Rent Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-university"></i> Bank Account Integration
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle"></i> About Akahu Integration</h5>
+                    <p>Akahu is a secure financial data platform that allows Rent Tracker to access your bank account transactions to automatically detect rent payments.</p>
+                    <ul class="mb-0">
+                        <li>Your banking credentials are never stored by Rent Tracker</li>
+                        <li>We only access transaction data, not your account balances or personal information</li>
+                        <li>You can revoke access at any time through your Akahu account</li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-warning">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Getting Your Akahu Credentials</h5>
+                    <p>To obtain your Akahu App Token and User Token:</p>
+                    <ol class="mb-0">
+                        <li>Visit the <a href="https://developers.akahu.nz/" target="_blank">Akahu Developer Portal</a></li>
+                        <li>Create a developer account if you don't have one</li>
+                        <li>Create a new application to get your App Token</li>
+                        <li>Generate a User Token for your bank account</li>
+                        <li>Enter both tokens below</li>
+                    </ol>
+                </div>
+
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-4">
+                        {{ form.app_token.label(class="form-label") }}
+                        {{ form.app_token(class="form-control" + (" is-invalid" if form.app_token.errors else ""), placeholder="Your Akahu App Token") }}
+                        {% if form.app_token.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.app_token.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">The App Token identifies your application with Akahu.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.user_token.label(class="form-label") }}
+                        {{ form.user_token(class="form-control" + (" is-invalid" if form.user_token.errors else ""), placeholder="Your Akahu User Token") }}
+                        {% if form.user_token.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.user_token.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">The User Token provides access to your specific bank account data.</div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
