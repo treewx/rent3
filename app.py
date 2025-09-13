@@ -41,10 +41,10 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 csrf = CSRFProtect(app)
 limiter = Limiter(
-    app,
     key_func=get_remote_address,
     default_limits=["200 per day", "50 per hour"]
 )
+limiter.init_app(app)
 
 # Stripe configuration
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
