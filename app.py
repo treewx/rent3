@@ -42,7 +42,8 @@ login_manager.login_view = 'login'
 csrf = CSRFProtect(app)
 limiter = Limiter(
     key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"]
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"  # Explicitly set in-memory storage for Railway
 )
 limiter.init_app(app)
 
@@ -100,7 +101,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/register', methods=['GET', 'POST'])
-@limiter.limit("3 per minute")
+@limiter.limit("10 per minute")
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
